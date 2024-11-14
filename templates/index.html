@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Prediction</title>
+
+    <!-- CSS Reset and Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- jQuery UI for Autocomplete -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- Custom CSS -->
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #1d2b64, #000000);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-size: 14px; /* Reduced font size for better fit */
+    }
+
+    .container {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        width: 100%;
+        padding: 2rem; /* Reduced padding to make it more compact */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .container:hover {
+        transform: translateY(-8px);
+    }
+
+    h2 {
+        font-weight: 700;
+        font-size: 1.6rem; /* Reduced heading size */
+        background: linear-gradient(135deg, #3498db, #2ecc71);
+        color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem; /* Reduced margin */
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem; /* Reduced gap between form elements */
+    }
+
+    .input-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem; /* Reduced gap between input fields */
+    }
+
+    .input-group {
+        flex: 1;
+    }
+
+    .input-group:last-child {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    label {
+        font-weight: 600;
+        margin-top: 1rem; /* Reduced margin */
+        margin-bottom: 0.5rem;
+        text-align: left;
+        color: #444;
+    }
+
+    input, select, button {
+        font-size: 0.9rem; /* Reduced font size */
+        padding: 0.8rem; /* Reduced padding */
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+    }
+
+    button {
+        background: linear-gradient(135deg, #1d2b64, #3498db);
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        margin-top: 1.2rem; /* Reduced margin */
+        cursor: pointer;
+        padding: 1rem;
+        font-size: 1rem; /* Reduced font size */
+        transition: background 0.3s ease;
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #2980b9, #1d2b64);
+    }
+
+    .prediction-text {
+        margin-top: 1.5rem; /* Reduced margin */
+        font-size: 1.1rem; /* Slightly smaller font */
+        font-weight: 500;
+        color: #2ecc71;
+        text-align: center;
+    }
+
+    .autocomplete-suggestions {
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .footer {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1rem;
+        font-weight: 500;
+        color: #fff;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 0.5rem;
+        border-radius: 8px;
+        width: fit-content;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+
+
+</head>
+<body>
+<div class="container">
+    <h2>Your Property's Rent: Let’s Calculate the Best Estimate</h2>
+    <form action="/predict" method="post">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="locality">Locality</label>
+                <input type="text" id="locality" name="locality" placeholder="Enter locality" required>
+            </div>
+            <div class="input-group">
+                <label for="city">City</label>
+                <select id="city" name="city" required>
+                    <option value="">Select City</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Nagpur">Nagpur</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="New Delhi">New Delhi</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="area">Area (in sqft)</label>
+                <input type="number" id="area" name="area" placeholder="e.g., 1200" required>
+            </div>
+            <div class="input-group">
+                <label for="bhk">BHK</label>
+                <input type="number" id="bhk" name="bhk" placeholder="e.g., 2" required>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="bathrooms">Bathrooms</label>
+                <input type="number" id="bathrooms" name="bathrooms" placeholder="e.g., 1" required>
+            </div>
+            <div class="input-group">
+                <label for="balconies">Balconies</label>
+                <input type="number" id="balconies" name="balconies" placeholder="e.g., 2" required>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group full-width">
+                <label for="furnishing">Furnishing</label>
+                <select id="furnishing" name="furnishing" required>
+                    <option value="">Select Furnishing</option>
+                    <option value="Semi-Furnished">Semi-Furnished</option>
+                    <option value="Unfurnished">Unfurnished</option>
+                    <option value="Furnished">Furnished</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">Predict Rent</button>
+    </form>
+
+    {% if prediction_text %}
+        <div class="prediction-text">{{ prediction_text }}</div>
+    {% endif %}
+</div>
+
+<div class="footer">
+    Made with ❤️ by Anand Dubey
+</div>
+
+
+    <!-- jQuery Autocomplete Script -->
+    <script>
+        const localities = ['Goregaon East', 'Powai', 'Mundhwa', 'Hingna', 'Mira Road', 'Jakkur', 'Chittaranjan Park', 'Soami Nagar South', 'Hadapsar', 'Kharadi', 'Indira Nagar', 'Whitefield', 'Bandra East', 'Jogeshwari Vikhroli Link Road', 'Hinjewadi', 'Jyoti Nagar East', 'Madanpur Khadar Village', 'C V Raman Nagar', 'Baner', 'Dudulgaon', 'Mohan Nagar', 'Balagere', 'Manewada', 'Wadala West', 'Dhanori Road', 'MedaHalli', 'Harsha Layout', 'Frazer Town', 'Loni Kalbhor', 'Kirkatwadi', 'Budigere', 'Chhattarpur', 'Dindoshi - Malad East', 'Raj nagar', 'Aundh', 'Wadi', 'Ram Das Peth', 'Kasavanahalli', 'Adarsh Nagar', 'Marathahalli', 'Hebbal', 'Bandra West', 'Mahipalpur', 'Bavdhan', 'Sahakara Nagar', 'Pitampura', 'Borivali East', 'Hennur', 'Andheri West', 'NIBM Road', 'Pimple Nilakh', 'Kalbadevi', 'Electronic City', 'Manjri Budruk', 'Lokhandwala Township Kandivali East', 'Kamptee Road', 'Hulimavu', 'Freedom Fighters Enclave', 'Sarjapur Road', 'Begur Road', 'Wanawari', 'Mulund East', 'Neeladri Nagar', 'Deonar Chembur', 'Commonwealth Games Village', 'Handewadi', 'Block C Dashrath Puri', 'Somalwada', 'Jogeshwari East', 'Rajarajeshwari Nagar', 'Besa', 'Hoodi', 'Ayodhya Nagar', 'HAL 3rd Stage', 'Ganesh Nagar', 'State Highway 104', 'Wagholi', 'Manyata Tech Park', 'Sector 6 Dwarka', 'Sion', 'Thanisandra Main Road', 'Nawada', 'Liberty Garden', 'Neelam Nagar', 'Napean Sea Road', 'PNS Layout', 'Borivali West', 'Khar West', 'Punawale', 'Chinchwad Gaon', 'New Colony', 'Lok Nayak Puram', 'Dighori Road', 'Pali Hill', 'Mohan Garden Uttam Nagar', 'Dhanori', 'Lohegaon', 'Malabar Hill', 'Dabha', 'Sone Gaon', 'Wardha', 'Sector 19 Dwarka', 'Mahalunge', 'Chhatarpur Extension', 'New Golden Nest Road', 'Ber Sarai', 'JVPD Scheme', 'Mahendra Park', 'Sagarpur West', 'Block 1st Koramangala', 'Wadgaon Sheri', 'Jaitala', 'Sampigehalli', 'Khapri', 'Chakan', 'Vasai East', 'Indira nagar Stage 2', 'Wakad', 'Sector 9 Dwarka', 'Chembur', 'Vishrantwadi', 'Bhugaon', 'Rajouri Garden', 'Gottigere', 'Chatrapati Nagar', 'Manjri', 'ITPL', 'Matunga West', 'Sant Nagar East of Kailash', 'Ashok Vihar', 'Grant Road East', 'Laxman Nagar Baner', 'Vasant Vihar', 'Suyog Nagar', 'Katraj', 'Yelahanka', 'Indraprastha', 'Lower Parel', 'Pushpanjali Enclave', 'Katol Road', 'Civil Lines', 'Amar Nagar Mulund West', 'Shastri Nagar', 'Wadala East', 'Undri', 'Domlur', 'Sector 14 Dwarka', 'Karve Nagar', 'Ravi Nagar', 'Kundan Nagar', 'Sector 23 Dwarka', 'Karol Bagh', 'Goregaon West', 'Harlur', 'Madhu Vihar', 'MKS Layout', 'BTM Layout Stage 2', 'Punvale Bazar', 'Bhandup', 'Tumkur Road', 'Nagdevanahalli', 'Kiwale', 'BTM Layout', 'Malviya Nagar', 'Horamavu', 'Charholi Budruk', 'Burari', 'Hoskote', 'Phase 5 JP Nagar', 'Mihan', 'Safdarjung Development Area', 'Andheri East', 'Bagalur Main Road', 'Phase 8th JP Nagar', 'Patel Nagar', 'Keshav Nagar', 'Sector 11 Dwarka', 'Kandivali West', 'Seven Bungalows', 'Thanisandra', 'Ashok Nagar', 'Kandivali East', 'Santacruz East', 'HSR Layout', 'Defence Colony', 'Air Force Area', 'Byrathi', 'Shalimar bagh', '1A Block Koramangala', 'Moti Nagar', 'Samata Nagar Thakur Village', 'Bommasandra', 'Four Bungalows', 'Kotewada', 'Avalahalli', 'Banaswadi', 'Jalahalli West', 'Sector 8 Dwarka', 'Malad East', 'Uttam Nagar', 'Sat Bari', 'Connaught Place', 'Govind Nagar Bhandup West', 'Palanahalli Road', 'Marunji', 'New Rajendra Nagar', 'Mukherjee Nagar', 'Safdarjung Enclave', 'Vikhroli East', 'Doddakannelli', 'Kaggadasapura', 'Worli', 'Virar West', 'Kalkaji', 'Bhandup West', 'Gopal Nagar', 'St Nagar Burari', 'Sector 14 Rohini', 'Neb Sarai', 'Kaval Byrasandra', 'Kammanahalli', 'Rahatani Gaon', 'Vinayak Nagar', 'Kirti Nagar', 'Yerwada Village', 'Sunkadakatte', 'Mahim West', 'Magathane', 'Old Rajendra Nagar', 'Godhani', 'Kakrola', 'Electronic City Phase 2', 'Anchepalya', 'Byculla', 'Ekta Nagar Kandivali West', 'Chincholi Phatak', 'Haji Colony', 'Pipla', 'Magarpatta City', 'Chinchwad', 'Choodasandra', 'Prithvi layout', 'Chandivali', 'Aali Village', 'Bannerghatta Road', 'KR Puram', 'Naigaon East', 'Dabri', 'Jeevan Niketan', 'Balewadi', 'Malad West', 'Seegehalli', 'Suyognagar', 'Thakur Village', 'Devanahalli', 'Laxmi Nagar', 'Laxmi Vihar Nawada', 'Rahatni', 'Abul Fazal Enclave Part 1', 'Spice Garden Layout', 'Dakshini Pitampura', 'Block 6th Koramangala', 'Ex Service Men Colony', 'Sus', 'Mahatma Gandhi Nagar', 'Pimpri', 'Kotla Mubarakpur', 'Katraj Kondhwa Road', 'Shanti Niketan', 'Karthik Nagar', 'Pimpri Chinchwad', 'Dahisar West', 'Wathoda', 'Nagavara', 'Sector 2 HSR Layout', 'Abbigere', 'Sector 4 Dwarka', 'JB Nagar', 'Butibori', 'Uruli Devachi', 'Manyata Residency', 'Jayprakash Nagar', 'Kapashera', 'Dattapada', 'RT Nagar', 'Arjan Garh', 'Pisoli', 'Akshya Nagar', 'Bhukum', 'Sneh Nagar', 'Shikrapur', 'South Extension 1', 'Mahadevapura', 'Vile Parle East', 'Bibwewadi', 'Parel', 'Dwarka Mor', 'Camp', 'Block 32 East Patel Nagar', 'Mahalaxmi Nagar', 'Gunjur Balagere Road', 'Mehrauli', 'Old Sangvi', 'Manjari Road', 'Sopan Baug Society', 'Saswad', 'Nathu Colony', 'Banashankari Stage 1', 'Chunabhatti', 'Surajmal Vihar', 'Rambaug Powai', 'Khar Danda', 'Manish Nagar', 'Block F Palam Extension', 'Hudkeshwar', 'Trilokpuri', 'Sadashiv Peth', 'Mahavir Nagar Kandivali West', 'Amravati Road', 'Aya Nagar', 'Film City Road', 'Wadala', 'Benson Town', 'Somatne Phata', 'Prabhadevi', 'Gokhale Nagar', 'Dollars Colony', 'Krishna Nagar', 'Tilak Nagar', 'Royal Palms Estate', 'Hazari Pahad', 'Hingna Road', 'Bellandur', 'Varthur', 'BEML Layout-Brookefield', 'Haralur Main Road', 'Kempapura Agrahara', 'Brookefield', 'Juhu Versova Link Road', 'Kurla', 'Vikaspuri', 'Koregaon Park Annexe', 'Wardha Road', 'Sector 24 Rohini', 'Muthanallur', 'Cuffe Parade', 'Phase 7 JP Nagar', 'Sector 9 Rohini', 'Chirag Delhi', 'Gummanahalli', 'Dehu Road', 'Tilekar Nagar', 'Kirari Suleman Nagar', 'Patel Nagar West', 'Mahavir Enclave Part 1', 'Shiv Kutir', 'Lajpat Nagar', 'Bangalore Shivamogga Road', 'Viman Nagar Central', 'Srinagar', 'Sector 23 Rohini', 'Kalyan Vihar', 'Sainik Nagar', 'Prem Nagar 3', 'Mahal', 'Hongasandra', 'Vazira Naka Borivali West', 'Salunkhe Vihar', 'Bibvewadi Road', 'Parwati Nagar', 'Shastri Nagar Mitha Nagar', 'Yelahanka New Town', 'Mangaldas Road', 'Naigaon East Vasai Link Road', 'Pardi', 'Kudlu', 'Vasai West', 'Sathya Sai Layout', 'Sector 3 HSR Layout', 'DDA', 'Naigaon Palghar', 'Virar', 'Narhe', 'Santacruz West', 'Mulund West', 'Indira Vihar', 'Wanadongri', 'Dighi', 'Annasandrapalya Extension', 'Sector 2 Rohini', 'Trimurti Nagar', 'Sector 5 HSR Layout', 'Devinagar', 'Sector 13 Rohini', 'Nala Sopara', 'Dadar West', 'Block F Karam Pura', 'Awhalwadi Road', 'Uday nagar', 'Upkar Layout Whitefield', 'Satara Road', 'Jafar Nagar', 'Koramangala', 'South Extension', 'GK I', 'Sarita Vihar', 'Ram Nagar', 'Attibele', 'Kalachauki', 'Sir M Visvesvaraya Inst Road', 'Nigdi', 'Mahaveer Nagar', 'Rajendra Nagar', 'Vyalikaval HBCS Layout', 'Laxmi Colony Hadapsar', 'Somwar Peth', 'Sector 15 Dwarka', 'Chander Vihar', 'Naganathapura', 'Rachenahalli Main Road', 'Kanakapura Road', 'East Of Kailash', 'Bidare Agrahara', 'Pedder Road', 'Banashankari', 'Kanjurmarg', 'Sarvapriya Vihar', 'Uttarahalli', 'Adarsh Nagar Lohegaon', 'Mansarovar garden', 'Greater Kailash', 'Sector R3 Amanora Park Town', 'Amruthnagar', 'Yerawada', 'Sector 17 Rohini', 'Saket', 'Sector 22 Rohini', 'Hingane Mala', 'Agrahara Layout', 'Ashirwad Nagar', 'Indra Park Extension', 'Hennur Main Road', 'Friends Colony', 'Phase 1st JP Nagar', 'Sector 22 Dwarka', 'Shiva Nagar', 'Vidhana Soudha Layout', 'Gujranwala Town', 'Moti Bagh', 'Nangloi Jat', 'Seegehalli Road', 'Block B4 Safdarjung Enclave', 'Nilothi', 'Hegde Nagar', 'Yelenahalli', 'Sector 7 Dwarka', 'Budh Vihar Phase 2', 'Sukhsagar Nagar', 'MCECHS Layout', 'Kalyani Nagar', 'Kurla West', 'Rajdhani Park', 'Bommanahalli', 'Phursungi', 'Atur Park', 'Vignan Nagar', 'Dange Chowk', 'Bellary Road', 'Chikkakannalli', 'Bachani Nagar', 'Sector 13 Dwarka', 'Jorbagh Tri Nagar', 'Citizen Colony', 'Raheja Vihar', 'Samethanahalli', 'Alaknanda', 'Chandapura', 'Pan Card Club Road', 'Fatima Nagar', 'Akurdi Chikhali Road', 'Mundka', 'Kannamangala', 'Sathanur', 'Lakkasandra Extension', 'Uruli Kanchan', 'Alandi', 'Hardev Nagar', 'Hingne Khurd', 'Kurla East', 'Manjunatha Nagar Kalkere', 'Kohat Enclave', 'Kalewadi Phata', 'Hauz Khas Enclave', 'Nangloi', 'GK II', 'Green Park', 'Bandra', 'Kundalahalli', 'Pimple Saudagar', 'Hinjewadi Phase 3', 'RHCS Layout', 'Ramesh Nagar', 'Prem Nagar Janakpuri', 'Shivaji Park', 'Bilekahalli', 'Defence Enclave', 'Transit Camp', 'Begur Hulimavu Road', 'Sinhgad Road', 'Rana Pratap Bagh', 'Chinchpokli', 'Adarsh Colony Tingre Nagar', 'Orlem', 'Subs Nagar', 'Kotwal Nagar', 'Sector 1 Dwarka', 'New International Airport Road', 'Prem Nagar Najafgarh', 'Irani Wadi', 'Mayur Vihar 1', 'Bannerghatta', 'Rameshwari', 'Bel Tarodi', 'Azadpur', 'Azad Nagar Wanowrie', 'Versova', 'Yamuna Vihar', 'Sarita Vihar Pocket H', 'Amboli', 'Kamgar Nagar Prabhadevi', 'Badli', 'Shivaji Nagar', 'New Moti Nagar', 'Vikhroli West', 'Lingarajapuram', 'Anand Niketan', 'Greater Kailash Enclave 1', 'Vile Parle West', 'Kudlu Gate', 'Siddhartha Enclave', 'Nandanvan', 'Hinjawadi Wakad Road', 'Munnekollal', 'Veerannapalya', 'Vadgaon', 'Janakpuri', 'Pai Layout Mahadevapura', 'Shastri Nagar Andheri West', 'Ramamurthy Nagar', 'Sector 11 Rohini', 'Gopal Nagar Extension', 'Vikaspuri Block F', 'Central Avenue', 'Janakpuri Block B1', 'Dapodi', 'Wardhaman Nagar', 'Bengaluru Kanakapura Road', 'Jamtha', 'Najafgarh', 'Narela', 'Shanti Nagar', 'Umred Road', 'Badarpur', 'Rayasandra Main Road', 'Nagapura', 'Bhandup East', 'Gulshan Nagar', 'Chokhandi', 'Pamposh Enclave', 'Manik Baug', 'Mico Layout', 'Nana Peth', 'Central Area', 'Palam Colony', 'Kempapura', 'Wagholi Road', 'Vigyan Vihar', 'Dilshad Garden', 'Jhilmil Colony', 'Siddharth Nagar Goregaon West', 'Sarjapur', 'Patparganj', 'Koregaon Park', 'Khanpur', 'Vipin Garden Extension North Block', 'Rajaji Nagar Block 2', 'Sri Balaji Layout', 'Moshi', 'Dahanukar Wadi', 'Nagpada', 'Bindapur', 'Judicial Layout', 'Gunjur', 'Cox Town', 'Singasandra', 'New Rohtak Road', 'Geetanjali Enclave', 'Sector 7 Rohini', 'Govandi', 'Narsala', 'Bharati Vidyapeeth Campus', 'Block C Bhajanpura', 'Aarey Colony', 'GTB Enclave', 'Singapura', 'Dharampeth', 'Girgaon', 'Paschim Vihar', 'Kale Padal', 'Attibele Anekal Road', 'Matunga', 'Indira nagar Stage 1', 'Vijay Nagar', 'Manohar Park', 'Bhavani Peth', 'Kodathi', 'Dhankawadi', 'Kamakshipalya', 'Mullur', 'Malka Ganj', 'ECC Road', 'Hebbal Kempapura', 'Naraina', 'Narendra Nagar', 'Chintamani Society Manjari Budruk', 'RMV Extension', 'Western Express Highway', 'Mahim', 'Koppa', 'Binnamangala Stage 1 Indiranagar', 'Sadashiva Nagar', 'Vasanth Nagar', 'Sagarpur', 'Pali Naka', 'Byramji Town', 'Handewadi Road', 'Channasandra', 'Rachenahalli', 'Mohammed Wadi', 'Ashram', 'Ghatkopar East', 'Zingabai Takali', 'Ghorpadi', 'Breach Candy', 'Kothrud', 'Maruthi Nagar Attiguppe', 'Pashan', 'Bandra Kurla Complex', 'Keshav Puram', 'Patel Nagar East', 'Razapur Khurd', 'HAL Old Airport Road', 'Old Baner Balewadi Road', 'Kondhwa', '90 Feet Road', 'Tughlakabad Extension', 'Lajpat Nagar 2', 'Pankha Road', 'Sector 28 Dwarka', 'Deonar Farm Road', 'Pandey Layout', 'Mumbai Central', 'Mysore Road', 'Utkarsh Nagar', 'Sector 1 Rohini', 'Shakti Nagar', 'Talacauvery Layout', 'Sakal Nagar', 'Teachers Colony', 'Lakshmipura', 'Vipin Garden', 'Colaba', 'Siddapur', 'Shadipur', 'Basavanagudi', 'Vibhutipura', 'Baljit Nagar', 'Mouza Shankarpur', 'Sion Chunabhatti', 'Kalyan Nagar', 'Abbaiah Reddy Layout', 'Tathawade', 'Block 3rd Koramangala', 'Rajaji Nagar', 'Kondhwa Budruk', 'Mangammanapalya', 'Govindpuri', 'Eklavya Colony', 'Preet Vihar', 'Johripur', 'Basai Darapur', 'Sewri', 'IP Extension', 'IC Colony', 'Rohtak Road', 'Banashankari Stage 2', 'Dhayari', 'Bhatwadi Ghatkopar West', 'Sector D Vasant Kunj', 'Ejipura', 'Kanakapura', 'Seegehalli KR Puram', 'Punjabi Bagh', 'Annapurneshwari Nagar', 'Dwarka', 'Pratap Nagar', 'Ghatkopar', 'Sector 17 Dwarka', 'Raj Nagar 2', 'Vasant Kunj', 'Sector 3 Rohini', 'Teachers Colony -HSR Layout', 'Vikas Puri Extension Part 1', 'Sector 2 Charkop', 'Nirankari Colony', 'Hari Nagar', 'Haiderpur', 'Sector 10 Dwarka', 'Kalu Sarai', 'C2 Block Janakpuri', 'BTM Layout Stage 1', 'Saki Naka', 'Sector 16 Rohini', 'Sector C Vasant Kunj', 'Tyagi Colony Nangloi Extension', 'Sadahalli Main Road', 'Hosa Road', 'Chakala MIDC', 'EON Free Zone', 'RS Palya', 'Mayur Vihar', 'Lokhandwala Complex Andheri West', 'Chamundeshwari Layout', 'Block 7th Jayanagar', 'Sector B Vasant Kunj', 'Mindspace', 'Block 5th Jayanagar', 'Kalina', 'Rajpur Khurd Extension', 'Devli', 'Ravet', 'Rama Park', 'Bapuji Nagar', 'Begur', 'Yelahanka Air Force base', 'Shiv Vihar', 'Bhalswa', 'Ganganagar', 'Sector 18 Dwarka', 'LIC Colony Vile Parle West', 'Sukhdev Vihar', 'Thite Nagar', 'Tardeo', 'Hinjewadi Rajiv Gandhi Infotech Park', 'Sompura', 'Palam', 'Vadgaon Budruk', 'Nanded', 'Shell Colony', 'Murugeshpalya', 'Tihar Village', 'Mohan Garden', 'Spencer Road', 'Poorvi Pitampura', 'Margondanahalli', 'Babusahib Palya', 'J Block Saket', 'Subhash Road', 'Udaya nagar', 'Molarband', 'Dahisar East', 'Jigani', 'Gujarat Vihar', 'Sector 25 Dwarka', 'Chichbhavan Main Road', 'Ramagondanahalli-Whitefield', 'Juhu', 'Nagondanahalli', 'Prabhat Road', 'Ambalipura Sarjapur Road', 'Kanjurmarg West', 'Shahu nagar', 'Sector 26 Dwarka', 'Jhandewalan', 'Devarabisanahalli', 'Green Park Extension', 'Hudkeshwar Road', 'Nahur East', 'Phase 2nd JP Nagar', 'Khamla', 'Goyla Village', 'Mangolpuri', 'Chandra Nagar', 'Worli Hill Road', 'Gowalia Tank', 'Malwadi', 'Doddanekundi', 'Block B Sewak Park', 'Basavanagar Main Road', 'Shyam Vihar 2', 'Dasghara', 'Mallathahalli', 'Jharoda Majra', 'Bhoslenagar Ashok Naga', 'Hunasamaranahalli', 'Sector 25 Rohini', 'Dutta Nagar', 'Anand Vihar', 'Anant Nagar', 'New Patel Nagar', 'Inlaks Nagar', 'Tukdoji Nagar', 'Sangam Vihar', 'Bhagwan Das Nagar', 'Lohegaon Wagholi Road', 'RMV Extension Stage 2', 'Sector 28 Rohini', 'Union Park', 'Munirka', 'Chimaji Nagar', 'HBR Layout', 'Bhoganhalli', 'Medical Square', 'Sanewadi', 'Rajpur Khurd', 'Karala', 'Vidyaranyapura', 'Maidan Garhi', 'Basavanagara', 'Bhagwan Tatyasaheb Kawade Road', 'Sector 35 Rohini', 'Model Colony', 'Soladevanahalli', 'Vasundhara Enclave', 'Subhash Nagar Bhandup West', 'Hosur Road', 'Kothnur', 'Shastri Park', 'GTB Nagar', 'Warje', 'Jayanagar', 'Lajpat Nagar 1', 'Jogeshwari West', 'Gorai 1', 'Sri Niwaspuri', 'Dhantoli', 'Mitganahalli', 'Sanjayanagara', 'Panchsheel Park', 'Jagatpuri', 'Halasuru', 'Kariyammana Agrahara', 'Kabir Nagar Vijay Park', 'Ghodbunder Road', 'Mysore Colony', 'Nagarbhavi', 'Mankapur', 'JP Nagar', 'Hastsal', 'Qutub Vihar', 'Airport Road', 'Talaghattapura', 'Marenahalli - Vijaynagar', 'Marathahalli village', 'JC Nagar-Kurubarahalli', 'Veerasandra', 'Mandawali', 'Mahalakshmi', 'Mahendru Enclave', 'Mavalli', 'Phase 1 Sivagiri Township', 'Thirumenahalli', 'Shivane', 'Matiala', 'Mumbai CST Area', 'Halanayakanahalli', 'Baner Mahalunge Road', 'Nari Road', 'Nizamuddin East', 'Saswad Road', 'Ghitorni', 'Palace Cross Road', 'Jaitpur Extension Part 2', 'Block 3rd Jayanagar East', 'Shankar Sheth Road', 'Guru Harikishan Nagar', 'Basaveshwar Nagar', 'Pul Prahlad Pur', 'K Channasandra', 'Eden Gardens', 'Krishna Nagar-Safdarjung Enclave', 'Marol', 'Srigandha Nagar', 'Mahavir Enclave', 'Bhuvaneshwari Nagar', 'Bajaj Nagar', 'Patel Nagar South', 'South Extension 2', 'Shiv Nagar', 'Vishwas Nagar', 'Bhapkar Mala', 'Virupakshapura', 'Mahatma Gandhi Road', 'Swastik Park', 'Valepura', 'Dhayari Phata Road', 'Koradi Road', 'Bijwasan', 'Kapashera Samalkha Road', 'Doddaballapur Main Road', 'Badarpur Extension', 'Rajaji Nagar Block 1', 'Isasani', 'Electronics City Phase 1', 'Mallasandra Village', 'Dadar East', 'Bhagwan Nagar', 'Central Avenue Road', 'Lashkari Bagh', 'D Block Saket', 'Kadugodi', 'Mayur Vihar Phase 2', 'Kanjurmarg East', 'Hinjewadi Phase 2', 'Kailash Colony', 'Mayur Vihar Phase 3', 'Tagore Garden', 'Uttam Nagar West', 'Chamrajpet', 'Sandesh Vihar', 'Upper Worli', 'Jhadavwadi Road', 'Jawahar Nagar', 'Uttari Pitampura', 'Kithaganur Main Road', 'Amrut Nagar Ghatkopar West', 'Binaki Mangal Barj', 'Chindwara Road', 'Devipada', 'Dadar', 'Maharani Bagh', 'Saini Enclave', 'MHADA Colony Mulund East', 'Asola', 'Datta Nagar Thergaon', 'Beadon Pura', 'Kogilu Main Road', 'Salisbury Park', 'Mangolpur Kalan', 'Tilak Nagar Chembur', 'Bettadasanapura', 'Ajit Nagar', 'Lal Baug', 'Walkeshwar', 'Tri Nagar', 'Narayanaghatta', 'Phase 2 Hinjawadi', 'Devarachikkana Halli', 'Chikkabanavara', 'Thambu Chetty Palya', 'Samalkha', 'Uttam Nagar East', 'Sector 12 Dwarka', 'Block 2nd JayaNagar East', 'Kishangarh', 'Shivajinagar', 'Phase 1st MCECHS Layout', 'Ketkipada', 'Andrahalli', 'Hadosiddapura', 'Savitri Nagar Village', 'Malleshpalya Main Road', 'Thergaon', 'Kalubai Nagar', 'Baner Road', 'Jangpura', 'Chennammana Kere', 'Goregaon Mulund Link Road', 'Garodia Nagar', 'Kala Nagar', 'Tingre Nagar', 'Meenakshi Layout Choodasandra', 'Basavanna Nagar', 'Talegaon Dabhade', 'Jacob Circle', 'Cambridge Layout', 'Qutub Vihar Phase 1', 'Seelampur', 'Sun City', 'Tilak Nagar Goregaon West', 'BCC Layout', 'Bhumkar Nagar', 'Shyam Nagar', 'Block 4th Jayanagar', 'Mithapur', 'Naraina Village', 'Khirki Extension', 'Dehu', 'Pune Solapur Highway', 'Nahar Nagar', 'Mahadevapura Layout', 'Richmond Town', 'Panchsheel Enclave', 'Wadki', 'Munireddy Layout', 'Pimple Gurav', 'Manewada Square', 'Pandav Nagar', 'Pant Nagar', 'Roop Nagar', 'Jivan Park Rani Bagh', 'Bhandarkar Road', 'Rakshak Nagar', 'Nagegowdanapalya', 'Tagore Nagar', 'Doddakallasandra', 'Chandan Nagar', 'Subhash Nagar', 'Koramangala 80 Feet Road', 'Hauz Khas', 'Gavane Pada', 'Tulaja Bhawani Nagar', 'Nisarga Nandana Layout', 'Yellappa Chetty Layout', 'Papareddipalya', 'Ashok Vihar Phase 3', 'Nerul', 'Gavanpada', 'Nehru Nagar', 'Inderpuri', 'Sitapuri', 'Kogilu', 'Kasba Peth', 'Dashrath Puri', 'Ambegaon Pathar Road', 'Shanthala Nagar', 'Dighori', 'Kemps Corner', 'Bharat Vihar', 'Lal Bahadur Shastri Road', 'Nimbalkar Nagar Lohegaon', 'Wakadewadi', 'HRBR Layout Block 1', 'Kammagondahalli', 'Kannuru', 'Balewadi Gaon', 'Dattwadi', 'Punjabi Bagh West', 'Laxmi Bai Nagar', 'Moshi High Street', 'Kabool Nagar', 'Ashok Nagar Kandivali East', 'Bagaluru', 'Yeswanthpur', 'Block 5th Koramangala', 'Ayappa Nagar KR Puram', 'Viveka Nagar', 'Patilnagar Chikhali', 'Mate Nagar', 'Doddathoguru', 'Pratik Nagar Mohanwadi', 'BDA layout-HSR Layout', 'T Dasarahalli', 'Sector 34 Rohini', 'Bahadura', 'Khadakwasla', 'Ambazari', 'HRBR Layout', 'Thakur Complex', 'Bengaluru Main Road', 'Panathur', 'Rustam Bagh Layout', 'Poonam Nagar Jogeshwari East', 'Teen Batti', 'Sector A6 Narela', 'Mandakini Enclave', 'Chikkanna Layout', 'Vishwakarma Colony', 'Vasanth Vihar AWHO', 'Kodigenahalli', 'Bhyraveshwara Nagar', 'Ram Krishna Nagar', 'Nagasandra Main Road', 'Greater Kailash 4 NRI Colony', 'Sanaswadi', 'Satya Niketan', 'Nallurhalli', 'Huvinayakanahalli', 'Kadubeesanahalli', 'Lulla Nagar', 'Dahisar', 'V Kallahalli', 'Greater Kailash 2 E Block', 'Mohamadwadi Settlement', 'Block B Rajouri Garden', 'Ganesh Peth', 'Gulmohar Park', 'Swavlambi Nagar', 'Ring Road', 'Borgaon', 'Gandhi Nagar Upper Worli', 'New Ashok Nagar', 'Aditya nagar', 'Model Town Phase 3', 'Vijaya Bank Layout Bommanahalli', 'Sita Buldi', 'Spine Road', 'Sitapuri Extension 2', 'Konanakunte', 'Deccan Gymkhana', 'Oshiwara', 'Parande Nagar', 'Sector 6 HSR Layout', 'Sion Hospital Colony', 'Bhosari', 'Acharya Niketan', 'Nirgudi Road', 'Vishal Nagar', 'Mahalakshmipuram Layout', 'Dabhai', 'Garmal', 'New Friends Colony', 'Arekere', 'Madhuban Colony Old Sangvi', 'Ashok Vihar Phase 1', 'Chikhali', 'Kiran Garden', 'Mahadev Nagar Dhayari', 'Lajpat Nagar 4', 'Anand Gram', 'Morevasti', 'Chittaranjan Park Block C', 'Pirangut', 'Tukai Nagar Vadgaon Budruk', 'Sector 9 Charkop', 'Baba Colony', 'Hinjewadi Phase 1', 'Marve Road', 'Pirojshanagar', 'Lonikand', 'Suryanagar', 'Block BP Shalimar Bagh', 'Ambedkar Colony Ambedkar Nagar', 'Lal Bahadur Shastri Nagar Dahisar West', 'East of Kailash Block B', 'Mankhurd', 'Tarun Bharat Society', 'New Kondli', 'Uday Baug', 'Neb Sarai Saket', 'Kumaraswamy Layout', 'Block 4 Subhash Nagar', 'Vikaspuri Block J', 'Brigade Metropolis', 'NelaMangala', 'Sindhi Colony Sion', 'Govind Nagar Borivali West', 'Ghatkopar West', 'Naidu Colony', 'Bhayandar East', 'Bhusari Colony', 'NIBM Annexe', 'Bopodi', 'Ganga Nagar Layout', 'IVC Road', 'Kamshet', 'Dakshinpuri', 'Janakpuri Block C2A', 'Sunder Nagar', 'Kad Nagar', 'Teka', 'Datta Nagar', 'Sarita Vihar Pocket L', '1st Block East', 'near Optima Heights', 'Sarjapura Attibele Road', 'Hanuman Nagar', 'Sector 6 Rohini', 'Paryavaran Complex', 'Jakkuru Main Road', 'Vijayanagar', 'Jakkasandra Extension', 'Madhuranagara', 'Hadapsar Road', 'Gandhi Bazar', 'Punjabi Bagh East', 'Matunga East', 'Mangdewadi', 'Adugodi', 'Michael Palya', 'Ramna Maruti', 'Hindu Colony', 'Bhau Patil Road', 'Abhyudaya Nagar', 'Brindavan Nagar Mathikere', 'Block R Mohan Garden Razapur Khurd', 'Chittaranjan Park Block A', 'Bank Colony Konanakunte', 'Dhirpur Village', 'Shahpur Jat', 'Shahdara', 'Byatarayanapura New Extension', 'Madhav Nagar', 'Bhageerath', 'Sakkardara', 'Block 1st JayaNagar', 'Hoskote Road', 'Block BH Shalimar Bagh', 'Jeevan Bima Nagar', 'Bileshivale', 'Anand Nagar Dahisar East', 'Shyam Vihar Phase 1', 'Balewadi Gaon Road', 'Old Shahabad Muhammad Pur', 'Dattawadi', 'Pai Layout Hulimavu', 'Ganji Bagh', 'Tavarekere BTM Layout', 'Bhosale Nagar', 'Bolinj', 'Basavanapura', 'Sector 5 Dwarka', 'Gokuldham', 'Dahanukar Colony', 'Karawal Nagar', 'Lonavala', 'Adchini', 'Shirgaon', 'Padam Nagar', 'Nizamuddin West', 'Chakkarwera', 'New Mahavir Nagar', 'Babhai Naka - Borivali West', 'Amrutahalli', 'Pannase Layout', 'Old Palam Road', 'Shalimar Bagh AG Block', 'Gaikwad Nagar Malad West', 'Chunchanakuppe', 'Tata Nagar', 'Kadugondanahalli', 'Ghodapdeo', 'Agar Bazar', 'Kodigehalli', 'Sector 6 Pocket 2 Dwarka', 'Green Woods layout', 'Sector 4 Rohini', 'Hoysalanagar', 'Bharat Nagar New Friends Colony', 'Tejaswini Nagar Phase 1', 'Kanaka Nagar', 'Hesarghatta Road', 'Block 3rd Narayana Nagar', 'Rohini', 'ITPL Main Road', 'Kattigenahalli', 'Bharat Nagar', 'Banashankari stage 6', 'Talegaon Dabhade R', 'Sangam Vihar Wazirabad', 'Thigalarapalya', 'Manakpura', 'Infantry Road', 'Basapura', 'Malleshwaram', 'Bhakti Park', 'Chhattarpur Enclave Phase 2', 'Kharbi', 'Nehru Enclave', 'Co operative Group Housing Societies Pitampura', 'Rainbow Drive', 'Prashant Vihar', 'Shanti Kunj', 'Mahipalpur Village', 'Adhyapak Nagar', 'Sector 18 Rohini', 'Sutarwadi', 'Cooke Town', 'Basaveshwara HBCS Layout', 'MC Layout', 'Kishan Ganj', 'Silicon Town', 'Kasturi Nagar', 'Marathahalli Sarjapur Outer Ring Road', 'Rajanukunte', 'Yemalur', 'Model Town', 'Vaiduwadi Hadapsar', 'Mazgaon', 'Tigri', 'Kumara park West', 'Shiv Nagar Extension', 'Santacruz', 'Kalena Agrahara', 'Grant Road', 'Devappa Layout', 'Greater Kailash Enclave 2', 'Pathanwadi', 'Panchshil Enclave', 'New Multan Nagar', 'D Group Layout', 'Shastrinagar', 'Kurar Village', 'Cleveland Town', 'Koramangala Block 4', 'Chowdeshwari Layout Marathahalli Village', 'Wazir Nagar', 'Reshim Bagh', 'Lajwanti Garden', 'Talawade Road', 'Triveni Nagar Hadapsar', 'Patteghar Palya Main Road', 'Kengeri', 'Rahate Colony', 'Maruthi Nagar Yelahanka', 'Chikkalasandra', 'Nandini Layout', 'Ganga Vihar', 'Kirti Nagar New Sanghavi', 'Chakala', 'Nalasopara East', 'Nara', 'Kaikondrahalli', 'Dehu Phata', 'Chikkagubbi Village', 'Dhanori Lohegaon Road', 'Sainik Farm', 'Sector 8 Charkop', 'New Ranjeet Nagar', 'AECS Layout Block A', 'Battarahalli', 'Jaripatka', 'Jankalyan Nagar', 'Sector 3 Dwarka', 'Banashankari Stage 3', 'Kengeri Main Road', 'Doopanahalli', 'Park Road', 'Juhu Scheme', 'Old Mahavir Nagar', 'Ambedkar Nagar Kondhwa', 'Kalpataru Estate Road', 'Puttanahalli', 'Somnath Nagar', 'Rajajinagar Stage 2', 'Fort', 'Shakarpur', 'Vaiduwadi', 'Vagdevi Layout', 'Old Govindpura', 'Wilson Garden', 'Kodichikknahalli', 'Old Madras Road', 'Mohammadpur Majri', 'Nandi Hills', 'Anjanadri Layout', 'Dhayari Phata', 'Mira Bhayandar', 'MR Society', 'Silver Oak Layout', 'Geeta Nagar Mira Road East', 'Commerzone IT Park', 'LBS Road', 'Ashwini layout', 'Kamla Nagar', 'Sector 5 Rohini', 'Mayur Kunj', 'Vittasandra Main Road', 'Hadapsar Gaon', 'Kengeri Satellite Town', 'Horamavu Main Road', 'Amarjyoti Layout-Domlur', 'Kolivery Village', 'Madavara', 'Shree Siddhivinayak Meera', 'Molarband Extension', 'Parekh Nagar Kandivali West', 'Golf Course Road', 'Gandhi Vihar', 'Deonar', 'Erandwane', 'Premier Residencies', 'Bommasandra Jigani Link Road', 'Laxmi Vihar', 'One North', 'Evershine Millennium Paradise', 'Dhaka Village', 'Goregaon', 'Boat Club Road', 'Shalimar Bagh Poorvi', 'Kishangarh Village', 'Vasai', 'Parel Village', 'Bhajanpura', 'Chikkabellandur', 'Marunji Road', 'Shakarpur Khas', 'Jadhavwadi', 'Gollarahatti', 'Sheikh Sarai', 'Laxmi Nagar Balewadi', 'Yari Road', 'Guru Nanak Nagar', 'Chandan Hola', 'Banashankari 6th Stage-11th Block', 'Chawri Bazar', 'Gokul Nagar Katraj', 'Gorai', 'Madan Park', 'ITI Layout', 'Dasarahalli Main Road', 'Panjri', 'Mawal', 'North Hadapsar', 'Ramgad Nagar Mulund West', 'Kalamna', 'Shanti Park', 'Perry Road', 'Jangpura Extension', 'Kariobanahalli', 'Malleshpalya', 'Aliganj', 'Uttarahalli Main Road', 'Bellandur-Marathahalli', 'B Narayanapura', 'Sai Nagar', 'New Sangvi', 'Kumbalgodu', 'Mianwali Nagar', 'Sangharsh Nagar', 'Bhaji Market Chandan Nagar', 'Ansari Nagar West', 'EPIP Zone', 'G Block Sahakar Nagar', 'Lakshminarayana Pura', 'Amrit Nagar', 'Lok Vihar', 'Chinnapanna Halli', 'Tagore Garden Extension', 'Manjri BK', 'Hennur Bagalur Main Road', 'Kaveri Nagar', 'Yojna Vihar', 'Royal Shelters', 'Mandvi', 'Iblur Village', 'OMBR Layout', 'Gattahalli', 'Pochanpur Colony', 'Kalwad Wasti', 'Palam Extension', 'LBS Nagar', 'Clover Park', 'Immadihalli', 'Talegaon Chakan Road', 'Block T West Patel Nagar', 'Azad Nagar Andheri East', 'Phadke Haud', 'Om Nagar', 'NR Colony', 'Worli Naka', 'Kodihalli', 'Kondivita Village Andheri East', 'Bhagwati Garden Extension', 'Sanjay Park', 'Syndicate Bank Colony', 'Jasola Vihar', 'Dooravani Nagar', 'Jasola', 'Tavarekere', 'MS Palya', 'Swargate', 'Shirwal', 'Borivali', 'Masjid Bandar West', 'Balkrishna Sakharam Dhole Patil Road', 'Daya Basti', 'Virar East', 'RBI Layout', 'ISRO Layout', 'Sant Nagar', 'Binny Pete', 'Anand Nagar Chinchwad', 'Anand Park', 'Ramanjaneyanagar', 'BDA Lay Out Chandra Layout', 'Doddanagamangala', 'Huskur', 'Gangadham', 'Lado Sarai', 'Bhandup Village Road', 'Vyalikaval', 'Bangur Nagar', 'Sangvi', 'Ghorpadi Road', 'Bund Garden', 'Veera Desai Industrial Estate', 'Vaishali Nagar', 'Chokkanahalli', 'Jijamata Road', 'Moodalapalya', 'Bawana', 'Sultanpur', 'Janak Park', 'Mulund', 'Nagasandra', 'Block W 22 South Sainik Farm', 'Madhu Vihar Patparganj', 'Manorayana Palya', 'Anand Nagar', 'Sai Baba Mandir Road', 'Thindlu', 'Kammasandra', 'Suryalok Nagari', 'Vitthal Nagar', 'Pocket 5 Sector 22 Rohini', 'Gorewada', 'Block B West Patel Nagar', 'Raje Sambhaji Nagar', 'Phursungi IT Park', 'Janakpuri Block A2', 'Kalewadi', 'Saibaba Nagar Borivali West', 'Linking Road', 'Medi Agrahara', 'Godbole Vasti', 'Canara bank Layout', 'Jalahalli East', 'Sainath Nagar Wadgaon Sheri', 'HBR Layout Block 3', 'Danda', 'Gokalpur East', 'Sarole', 'Sector 8 Rohini', 'Raghuvanahalli BCMC Layout', 'Unnat Nagar Goregaon West', 'Vikaspuri Block H', 'Shivalik Road', 'East of Kailash Block F', 'Sayani Road', 'Vijay Vihar', 'IGNOU Main Road', 'Pashan Sus Road', 'Munikalappa Layout', 'Khatau Estate', 'Kothrud Bus Stand Road', 'Patil Nagar', 'Old Guddadahalli', 'Ganesh Nagar Kalaram Nagar', 'Kaspate Vasti', 'Paschim Puri', 'Mathrushree Layout Doddamuniswamy Reddy Layout', 'Mahavir Enclave Part 2', 'Geeta Colony', 'Ram Nagar Baner', 'Laxmi Road', 'Wadachi Wadi', 'Thurahalli', 'Tukaram Nagar', 'Outram Lines', 'Shahbad Daulatpur Village', 'Sudhama Nagar', 'Chaudhari Wasti', 'Azad Market', 'Hennur Bande Road', 'Sannatammanahalli', 'Wagholi Keshnand Road', 'Varthur Kodi', 'Dera Mandi', 'Richards Town', 'Virender Nagar', 'RPC Layout', 'Haralur', 'Hari Enclave', 'Bagalur Sarjapur Road', 'Ashok Vihar Phase 2', 'Sasane Nagar', 'Sade Satra Nali', 'Krishna Nagar Karol Bagh', 'Lajpat Nagar 3', 'Coffee Board layout', 'Nehru Vihar', 'Atmananda Colony', 'Gahunje', 'Siddheshwar Nagar', 'Nayandahalli', 'Phase 2 Magarpatta', 'Gilbert Hill', 'Maithri Layout', 'Dwarka Sector 19B', 'Matadahalli', 'Vayisena Nagar', 'Nangli Vihar', 'Shankarpur', 'Devidas Road', 'Thyagaraja Nagar', 'Nalasopara West', 'Richmond Road', 'Uttam Nagar Nawada', 'Sector 2 Dwarka', 'Aga Nagar', 'Chikhalwadi', 'Paschim Vihar Block B2', 'Silver County Road', 'Hanumanthappa Layout Sivanchetti Gardens', 'Anand Parbat', 'Shanti Vihar', 'Old Gupta Colony', 'Surya Enclave', 'Kada Agrahara', 'Kucha Pati Ram', 'Ravet Road', 'Ujwal Nagar', 'Naigaon West', 'AECS Layout Block D', 'Friends Colony West', 'Kothnoor Dinne', 'Jalahalli', 'Prahlad Pur Banger', 'DLF Farms', 'Khajuri Khas', 'Raut Wadi Lavale', 'Adarsh Nagar Bindapur Extension', 'Swaraj Nagar', 'Jai Prakash Nagar', 'Shyam Enclave', 'Durga Vihar', 'Kondli', 'Goyla Dairy', 'Wazirabad', 'Ulhasnagar', 'Yelachenahalli', 'Vasant Kunj Enclave', 'Guruwar Peth', 'Vijayapura Town', 'Bhavani Nagar', 'Baner Gaon', 'Itwari', 'Vijay Colony Vijay Nagar', 'Sakore Nagar', 'Khadki', 'Shitladevi Chawl', 'Kavde Nagar', 'Pillaganahalli', 'Manjunatha Layout Munnekollal', 'SG Palya', 'Konena Agrahara Murgesh Pallya', 'Arjun Park', 'Deonar Village Road', 'Block 2nd Koramangala', 'Rajarajeshwari Nagar Stage 5', 'Sector 23B Dwarka', 'Laxmi Nagar Dhanori', 'Sector 19 Rohini', 'Kenchenhalli', 'Ittamadu Main Road', 'New Modern Shahdara', 'Block BJ Shalimar Bagh', 'Parshiwada', 'Gautam Nagar', 'Borewell Road', 'Jaunapur', 'Vivek Vihar Phase 1', 'Kapil Nagar', 'Nyanapanahalli', 'Elus Road', 'Andheri', 'Rani Bagh Pitam Pura', 'Nandanwan Layout', 'Kharadi Gaon', 'Hadapsar Industrial Estate', 'Nilothi Village', 'Kannamwar Nagar 1', 'Market Yard', 'Navghar Mulund East', 'jakkur Plantation', 'Masoodpur', 'Kharadi South Main Road', 'Sector 1 Charkop', 'Best Colony Chembur East', 'Rayasandra', 'Parappana Agrahara', 'Sambhaji Nagar Mulund West', 'Mayur Vihar Phase 1 Extension', 'Baner Aundh Road', 'Kirol Village', 'Shalimar Bagh AH Block', 'Wadgaon Budruk', 'Junnasandra', 'Byrappa Layout RMV 2nd Stage', 'Kalappa Layout', 'Mansa Ram Park', 'Ghazipur', 'Best Colony Parel', 'Sasane Colony', 'Kutwal Colony', 'Fish Market Area', 'Seegehalli Kannamangala Road', 'Jangpura A', 'Mahim United Industrial Estate', 'Vinoba Puri', 'Kanhe', 'Azad Nagar Andheri West', 'Budigere Road', 'Stage 1st Kumaraswamy Layout', 'Seminary Hill', 'Janki Kutir', 'Kodipalya', 'Laxmi Sagar Layout', 'Patel Garden', 'Chakan Nanekarwadi Pune Highway', 'Adarsh Nagar Jogeshwari West', 'Vimanapura', 'Chinch Bhaul', 'Datta Mandir Road', 'AnjanaPura', 'Phase 5 Aya Nagar', 'Vile Parle', 'Devasthanagalu', 'Jivanahalli', 'Rajiv Gandhi Nagar Bhandup West', 'Barve Nagar', 'Block A Mohan Garden', 'Sarai Rohilla', 'Manyata Tech Park Road', 'Bhujbal Vasti', 'Waddhamna', 'AK Colony Domlur', 'Mathikere Extension', 'Peace layout', 'Shiv Park Kakrola', 'Chhattarpur Enclave Phase 1', 'Sadhna Enclave', 'Sultanpalya', 'Sector 20 Rohini', 'Gubbalala', 'Hinjewadi Village', 'Block ND Dakshini Pitampura', 'Gorai 2', 'Dollar Scheme', 'Choudhary Park', 'Kalidasa Layout', 'Agarkar Nagar', 'Vikaspuri Block D', 'Yewalewadi', 'Chedda Nagar', 'Varanasi', 'Naidu Layout Electronic City', 'Sunder Nagar Malad West', 'Lalbaug Sion', 'Jayanagar Housing Society Layout', 'Nipania', 'Nehru Nagar Airport Area', 'Jagriti Enclave', 'Sant Nagar Lohegaon', 'Hill & Dales', 'Sindhi Colony', 'Bidarahalli', 'Joggers Park', 'Kanji House', 'Bhoiwada - Parel', 'Balaji Layout Cooke Town', 'Doddanekundi Main Road', 'Old Ferry Road', 'Dasarahalli', 'MS Ramaiah City Layout', 'Attur Layout', 'Mall Road', 'Sector 21 Rohini', 'Kharodi', 'Sector 4 HSR Layout', 'Aundh Gaon', 'Sri Sai Layout', 'Someshwara Layout', 'Bikasipura', 'GM Palya', 'Churchgate', 'Kendriya Vihar Road', 'Nirman Vihar', 'Dayanand Colony', 'Krishna Nagar More Vasti', 'Vigneshwara Layout Hoysala Nagar', 'Giri Nagar', 'Bhavani Nagar Shakti Farm', 'Block 3 Ramesh Nagar', 'Banarsi Das Estate', 'Ingole Nagar', 'Mithapur Extension', 'Daryaganj', 'HMT Layout Vidyaranyapura', 'Shree Nagar', 'CQAL Layout', 'Indra Enclave', 'Munirka Enclave', 'Bhayandar West', 'Yogi Nagar', 'Shinde Nagar Mulanagar', 'MLS Colony', 'Baprola', 'Raghu Nagar', 'ManganaHalli', 'Neelasandra', 'Channasandra Main Road', 'Maruthi Nagar Dasarahalli', 'Kundalahalli Colony', 'Srirampuram', 'Battipada', 'Sahakar Nagar', 'Jonapur', 'Kokanipada', 'Amar Colony', 'Riddhi Gardens', 'Patrakar Nagar', 'Virgonagar Industrial Estate', 'Shivaji Nagar - Aarey Milk Colony', 'Kailashpuri', 'Lavelle Road', 'Gandhi Nagar Bandra East', 'Rajas Society', 'Muranjan Wadi', 'Victoria Layout', 'Charni Road', 'Sector 15 Rohini', 'Jayamahal Main Road', 'Indora', 'Shankar Nagar', 'LIC Colony Borivali West', 'Block WZ Uttam Nagar', 'Madh', 'Kudje Khadakwasla Link Road', 'Mohan Nagar Co operative Society', 'Uday Park', 'Mahadev Wadi', 'Mathikere', 'Sector 11 New Thippasandra', 'Tathawade Road', 'Navagaon', 'Chikkajala', 'Bhagat Vihar', 'Maruti Nagar', 'Godrej Colony', 'Meeta Nagar', 'Sheikh Sarai Phase 2', 'Padmavati Nagar Bhayandar West', 'Laggere', 'Adarsh Palm Retreat', 'Kanchpada', 'Worli Sea Face', 'AMS Layout', 'Anantapura', 'Sheikh Sarai Phase 1', 'Pulkeshi Nagar', 'Lavakusha Nagar', 'Chanakya Place', 'Gruha Lakshmi Layout', 'Dahanukar A', 'Nityanand Nagar Ghatkopar West', 'Brhmanwada', 'Shubham Enclave', 'Chikku Lakshmaiah Layout', 'Gopasandra Sarjapura Road', 'Ram Nagar Tathawade', 'Korba Mithagar', 'Freedom Fighter Colony', 'F Block Sahakar Nagar', 'Tivri', 'Bellandur Lake Road', 'Vardhman Nagar', 'Hemkunt Colony', 'Sugaon', 'Bajrang Nagar', 'Bk Dutt Colony', 'Golf Links', 'Sambhaji Nagar', 'Sanjay Colony Narela', 'Vishnu Garden', 'Wakad Road', 'Gokul Nagar Dhanori', 'Harsh Vihar Pitampura', 'Chikkabidarakallu', 'Hosakerehalli', 'Tilak Nagar Sewri', 'Hauz Rani', 'Somasundarapalya', 'Vishwas Park', 'Cunningham Road', 'Best Nagar - Goregaon West', 'Tulasi Layout', 'MBH Colony', 'Raheja Township', 'Roshanpura', 'Meenakshipuram', 'Deepanjali Nagar', 'Masjid Moth', 'Agripada', 'Charkop', 'Bhilgaon', 'Model Town Andheri West', 'Anjana Nagar', 'Mahindra Park', 'Kandivali', 'Santhosh Nagar', 'Hutchins Road', 'Block B Surajmal Vihar', 'Kalewadi Road', 'Balaji Nagar', 'A Narayanapura', 'Blue Ridge Town Pune', 'Vikhroli Village', 'Budh Vihar', 'Aya Nagar Phase 1', 'Bhola Nath Nagar', 'Balaji Layout', 'Basapura Main Road', 'Kiran Vihar', 'Yashwant Nagar Kharadi', 'Ashok Niketan', 'Rajaji Nagar Industrial Town', 'Vittal Mallya Road', 'Kanakiya', 'Ramchandrapura', 'Mohit Nagar', 'Chikhali Road', 'Subbaiahnapalya', 'Anand Vihar Nangli Sakrawati', 'Garhi', 'Anand Nagar- Hebbal', 'Mylappanahalli', 'Vivek Vihar', 'Paschim Vihar Block A3', 'Shreshtha Vihar', 'Abhyankar Nagar', 'Eksar Road', 'Thubarahalli', 'Shantivan', 'Pathare Wasti Road', 'Ambalipura', 'Jasminium Society', 'Ranala', 'Ambewadi Malad East', 'Khichripur', 'Old Nangal', 'Evershine Nagar', 'HBR Layout Block 2', 'Sector 1 HSR Layout', 'Jagat Puri Krishna Nagar', 'Mukherjee Nagar Burari', 'Krushna Nagar Chinchwad', 'Patil Nagar Balewadi', 'Hatkesh Udhog Nagar', 'Sadh Nagar', 'Nanjappa Layout Adugodi', 'Guru Arjun Nagar', 'Jahangirpuri', 'Waliv Phata', 'AECS Layout-Singasandra', 'Central Ordanance Depot', 'Landewadi', 'Pocket 10 Sector B Vasant Kunj', 'Holiday Village Road', 'Shyam Nagar Okhla', 'Yadav Park Extension', 'Trinity Church Road', 'Masjid Bandar', 'Saint Thomas Church Road', 'Green Hills', 'Kadabagere', 'Mundhwa Manjari Road', 'Yamuna Nagar Andheri West', 'Medical Chowk', 'Gaikwad Vasti', 'Sector 16B Dwarka', 'Kalachowki', 'Phase 3 Reliable Residency Layout', 'Pragathi Nagar', 'Swasthya Vihar', 'Chhawla', 'Dabri Extension', 'Gondia', 'Shri Krishna Nagar', 'Samaspur Village', 'Anjanapura Township', 'Qutub Vihar Phase 2', 'Govindpura']
+;
+        $(function() {
+            $("#locality").autocomplete({
+                source: localities,
+                minLength: 2
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
