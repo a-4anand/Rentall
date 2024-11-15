@@ -24,7 +24,7 @@ To run this application locally, ensure the following are installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/RenAll.git
+   git clone https://github.com/a-4anand/Rentall.git
    cd RenAll
 
 
